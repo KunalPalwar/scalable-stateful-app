@@ -1,17 +1,35 @@
 import { WebSocketServer, WebSocket } from 'ws';
 
 const wss = new WebSocketServer({ port: 8080 });
-interface Rooms {
+interface Room {
     sockets: WebSocket[];
 }
-const rooms: Record<string, WebSocket> = {};
+
+export type Data = {
+    type: string;
+    room: string;
+    message: string;
+};
+
+const rooms: Record<string, Room> = {};
 
 wss.on('connection', function connection(ws) {
     ws.on('error', console.error);
 
-    ws.on('message', function message(data) {
-        console.log('received: %s', data);
-    });
+    ws.on('message', function message(data: string) {
+        const parsedJson = JSON.parse(data);
+        const room = parsedJson.room;
+        if (parsedJson.type === 'join-room') {
+            if (!rooms[room]) {
+                rooms[room] = { sockets: [] };
+            }
+            rooms[room].sockets.push(ws);
+        }
 
-    ws.send('something');
+        if (parsedJson.type === 'chat') {
+            rooms[parsedJson.room].sockets.map((soc) => {
+                soc.send(data);
+            });
+        }
+    });
 });
