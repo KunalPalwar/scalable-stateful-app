@@ -1,11 +1,11 @@
 import { WebSocket } from 'ws';
-import { Data } from '.';
 
 describe('Chat Application', () => {
     test('Message sent from room1 reached to room2', async () => {
-        const BASE_URL = 'ws://localhost:8080';
-        const ws1 = new WebSocket(BASE_URL);
-        const ws2 = new WebSocket(BASE_URL);
+        const BASE_URL1 = 'ws://localhost:8080';
+        const BASE_URL2 = 'ws://localhost:8081';
+        const ws1 = new WebSocket(BASE_URL1);
+        const ws2 = new WebSocket(BASE_URL2);
 
         await new Promise<void>((res, rej) => {
             let count = 0;
